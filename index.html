@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COPD – Parcours d’apprentissage</title>
+<meta name="theme-color" content="#1E2227">
+<style>
+:root{--rouge:#B3121F;--rouge-f:#7E0C16;--rouge-c:#F7E4E5;--argent:#8B9199;--argent-c:#E6E8EB;--encre:#1E2227;--gris:#5A6068;--papier:#FAFAF8;--blanc:#fff;--vert:#2E7D4F;--vert-c:#E3F2E8;--ambre:#A86B00;--ambre-c:#FFF4DC}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--papier);color:var(--encre);font:15px/1.5 "Segoe UI",Calibri,Arial,sans-serif}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:.2em 0 .5em}
+h2{font-size:1.5em;color:var(--rouge-f)}h3{font-size:1.1em;margin-top:1.2em}
+header{display:flex;align-items:center;gap:16px;padding:10px 20px;background:linear-gradient(90deg,var(--encre),#2C3138);color:#fff;border-bottom:4px solid var(--rouge)}
+header .t1{font-family:Georgia,serif;font-size:1.35em;letter-spacing:.02em;margin:0}
+header .t2{font-size:.85em;color:var(--argent-c);opacity:.85}
+header .prog{margin-left:auto;text-align:right;font-size:.85em;min-width:150px}
+header button{background:none;border:1px solid var(--argent);color:#fff;border-radius:4px;padding:4px 10px;cursor:pointer;font:inherit}
+.bar{height:8px;background:#444b54;border-radius:4px;overflow:hidden;margin-top:4px}.bar>i{display:block;height:100%;background:var(--rouge);width:0}
+.wrap{display:flex;min-height:calc(100vh - 80px)}
+nav{width:290px;flex-shrink:0;background:var(--blanc);border-right:1px solid var(--argent-c);padding:12px 0;overflow-y:auto}
+nav .grp{font-size:.72em;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);padding:12px 18px 4px;font-weight:600}
+nav a{display:flex;align-items:center;gap:8px;padding:7px 18px;color:var(--encre);text-decoration:none;font-size:.92em;border-left:3px solid transparent;cursor:pointer}
+nav a:hover{background:var(--argent-c)}
+nav a.on{background:var(--rouge-c);border-left-color:var(--rouge);font-weight:600}
+nav .st{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:inline-grid;place-items:center;font-size:11px;border:1.5px solid var(--argent)}
+nav .st.ok{background:var(--vert);border-color:var(--vert);color:#fff}
+main{flex:1;padding:22px 34px 60px;max-width:1100px;min-width:0}
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--argent-c);margin:14px 0 18px;flex-wrap:wrap}
+.tabs button{background:none;border:none;padding:9px 16px;font:inherit;cursor:pointer;color:var(--gris);border-bottom:3px solid transparent;margin-bottom:-2px}
+.tabs button.on{color:var(--rouge-f);border-bottom-color:var(--rouge);font-weight:600}
+.card{background:var(--blanc);border:1px solid var(--argent-c);border-radius:6px;padding:14px 18px;margin:12px 0}
+.but{border-left:4px solid var(--rouge);background:var(--rouge-c)}
+.ac{border-left:4px solid var(--ambre);background:var(--ambre-c)}
+.ac b{color:var(--ambre)}
+.src{font-size:.8em;color:var(--gris);font-style:italic}
+.q{margin:14px 0}.q label{display:block;padding:4px 8px;border-radius:4px;cursor:pointer}
+.q label.ok{background:var(--vert-c)}.q label.ko{background:var(--rouge-c)}
+.btn{background:var(--rouge);color:#fff;border:none;border-radius:4px;padding:8px 16px;font:inherit;cursor:pointer;margin:4px 6px 4px 0}
+.btn.s{background:var(--blanc);color:var(--rouge-f);border:1px solid var(--rouge)}
+.fld{margin:10px 0}.fld label{display:block;font-weight:600;font-size:.92em;margin-bottom:3px}
+.fld textarea{width:100%;min-height:70px;font:inherit;padding:6px 8px;border:1px solid var(--argent);border-radius:4px;background:#fff}
+.fld .h{font-size:.82em;color:var(--gris);margin-bottom:3px}
+table{border-collapse:collapse;width:100%;margin:8px 0;background:#fff}td,th{border:1px solid var(--argent-c);padding:6px 8px;text-align:left;vertical-align:top;font-size:.92em}th{background:var(--argent-c)}
+.score{font-weight:600;margin-top:10px}
+.burger{display:none}
+@media(max-width:800px){.wrap{display:block}nav{width:auto;display:none;border-right:none;border-bottom:1px solid var(--argent-c)}nav.open{display:block}main{padding:16px}.burger{display:inline-block}header{flex-wrap:wrap}header .prog{min-width:0}}
+@media print{header,nav,.tabs,.btn{display:none!important}main{padding:0}}
+</style>
+</head>
+<body>
+<header>
+ <button class="burger" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Menu">☰</button>
+ <div><h1 class="t1" id="ttl"></h1><div class="t2" id="sub"></div></div>
+ <div class="prog"><button id="lng" onclick="toggleLang()"></button><div id="pt" style="margin-top:6px"></div><div class="bar"><i id="pb"></i></div></div>
+</header>
+<div class="wrap"><nav id="nav"></nav><main id="main"></main></div>
+<script>
+/* COPD – parcours d'apprentissage (livraison 1). Contenu fondé uniquement sur des sources ouvertes listées dans le module « Sources ».
+   Règle : tout ce qui n'a pas pu être vérifié sur une source ouverte est affiché dans un encadré « À compléter ». */
+let lang=(()=>{try{return localStorage.getItem("copd-lang")||"fr"}catch(e){return"fr"}})();
+const L=a=>Array.isArray(a)?a[lang==="en"?1:0]:a;
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const UI={
+ ttl:["COPD – Parcours d’apprentissage","COPD – Learning path"],
+ sub:["Planification opérationnelle OTAN (niveau opératif) · EdG – EEM","NATO operations planning (operational level) · EdG – EEM"],
+ lng:["English","Français"],
+ prog:["Étapes validées","Validated steps"],
+ tabs:[["Comprendre","Understand"],["S’entraîner","Practise"],["Appliquer","Apply"]],
+ but:["But","Aim"],todo:["À compléter","To be completed"],
+ todoh:["Point non vérifié sur une source ouverte : à compléter par l’instructeur à partir du COPD V3.0.","Not verified against an open source: to be completed by the instructor from COPD V3.0."],
+ check:["Corriger","Check"],retry:["Recommencer","Try again"],
+ score:["Score","Score"],valid:["Étape validée (≥ 70 %).","Step validated (≥ 70%)."],notv:["Moins de 70 % : relisez l’onglet Comprendre.","Below 70%: review the Understand tab."],
+ tplh:["Gabarit proposé pour s’exercer. Il ne reproduit pas un formulaire officiel du COPD.","Practice template. It does not reproduce an official COPD form."],
+ save:["Sauvegarder (.json)","Save (.json)"],load:["Reprendre une sauvegarde","Load a save"],print:["Imprimer / PDF","Print / PDF"],clear:["Effacer mes saisies","Clear my entries"],
+ clearq:["Effacer toutes vos saisies et vos résultats ?","Clear all your entries and results?"],
+ noquiz:["Pas de quiz pour ce module.","No quiz for this module."],notpl:["Pas de gabarit pour ce module.","No template for this module."],
+ vienne:["Fil rouge VIENNE","VIENNE running case"],
+ grp:{intro:["Démarrer","Start"],cadre:["Cadre","Framework"],op:["Phases du niveau opératif","Operational-level phases"],out:["Ressources","Resources"]}
+};
+const SRC={
+ S1:["CHIRIAC C., « COPD V3.0 and Implications on the Joint Level », Bulletin of “Carol I” National Defence University, 11(2), 2022, p. 7-13.","https://doi.org/10.53477/2284-9378-22-68"],
+ S2:["FAZEKAS F., « A NATO átfogó művelettervezési útmutatójának evolúciója » [L’évolution de la COPD de l’OTAN], Hadtudomány, 32(4), 2022, p. 45-61.","https://doi.org/10.17047/HADTUD.2022.32.4.45"],
+ S3:["SZABADFÖLDI I., NÉGYESI I., « The Comprehensive Approach of Military Strategic Operations Planning and its Support by Artificial Intelligence », HDR, 2023, n° 1-2, p. 4-20.","https://real.mtak.hu/217706/1/002_Istv%C3%A1n+Szabadf%C3%B6ldi+and+Imre+N%C3%A9gyesi_4-20.pdf"],
+ S4:["MARCO OLIVERA R. (CDT), « La OTAN y las herramientas de planeamiento operacional: del fin de la Guerra Fría a la directiva actual », 24 mai 2023 (publié sur defensa.gob.es).","https://www.defensa.gob.es/documents/2073105/2352545/la_otan_y_las_herramientas_de_planeamiento_operacional.pdf/148dae1f-be70-a980-c997-59cf73eb4a22?t=1737979415976"],
+ S5:["NATO, AJP-5 Allied Joint Doctrine for the Planning of Operations, Edition B, Version 1 (lettre de promulgation OTAN du 17 juin 2026), version avec éléments nationaux britanniques, gov.uk.","https://assets.publishing.service.gov.uk/media/6a43a8dbfa72f76532a4e3bd/AJP_5_EdB_NATO.pdf"],
+ S6:["UK MOD, « AJP-5 bite size doctrine » (fiche de synthèse), gov.uk.","https://assets.publishing.service.gov.uk/media/6acf402c2de3184ccf8b8082/AJP_5_bite_size_doctrine.pdf"],
+ S7:["CIMIC Centre of Excellence, CIMIC Handbook, § 5.1 « CIMIC in operational planning ».","https://www.cimic-coe.org/handbook-entries/welcome-to-the-cimic-handbook/v-cimic-contribution-to-the-planning-processes/5-1-cimic-in-operational-planning/"]
+};
+const s=(...k)=>k.join(", ");
+/* Modules. sec: {h,p|li,src}. todo: points à compléter. quiz: {q,o,a,src}. tpl: champs {k,l,h}. */
+const M=[
+{id:"accueil",g:"intro",t:["Accueil","Home"],
+ but:["Apprendre, étape par étape, la planification opérationnelle de l’OTAN au niveau opératif telle que la décrit la COPD (Comprehensive Operations Planning Directive), en s’appuyant uniquement sur des sources ouvertes.","Learn, step by step, NATO operations planning at the operational level as described in the COPD (Comprehensive Operations Planning Directive), using open sources only."],
+ sec:[
+ {h:["Comment travailler","How to work"],li:[
+  ["Chaque étape se travaille en trois onglets : Comprendre, S’entraîner (quiz corrigé, étape validée à partir de 70 %), Appliquer (gabarits à remplir).","Each step has three tabs: Understand, Practise (marked quiz, step validated from 70%), Apply (templates to fill in)."],
+  ["Vos saisies restent dans votre navigateur. Vous pouvez les sauvegarder en fichier .json, les reprendre, ou les imprimer.","Your entries stay in your browser. You can save them to a .json file, reload them, or print them."],
+  ["Bouton en haut à droite : passage du français à l’anglais.","Top-right button: switch between French and English."]]},
+ {h:["Avertissement","Disclaimer"],p:["Outil pédagogique : il ne se substitue pas au COPD ni à l’AJP-5 en vigueur. Le texte du COPD V3.0 (2021) n’a pas été trouvé en diffusion publique officielle : ce parcours s’appuie sur l’AJP-5 Ed. B (publiée sur gov.uk) et sur des articles en accès ouvert qui décrivent le COPD. Tout ce qui n’a pas pu être vérifié est signalé dans un encadré « À compléter ».","Training aid: it does not replace the COPD or the current AJP-5. The text of COPD V3.0 (2021) was not found in an official public release: this course relies on AJP-5 Ed. B (published on gov.uk) and on open-access articles describing the COPD. Anything that could not be verified is flagged in a “To be completed” box."]}]},
+{id:"cadre",g:"cadre",t:["Le COPD et ses versions","The COPD and its versions"],
+ but:["Situer le COPD : ce qu’il est, ses versions successives, les niveaux qu’il couvre.","Place the COPD: what it is, its successive versions, the levels it covers."],
+ sec:[
+ {h:["Versions","Versions"],li:[
+  ["COPD Interim V1.0 : 2010.","COPD Interim V1.0: 2010."],
+  ["COPD Interim V2.0 : 2013.","COPD Interim V2.0: 2013."],
+  ["COPD V3.0 : 2021 (datée du 15 janvier 2021 selon S4).","COPD V3.0: 2021 (dated 15 January 2021 according to S4)."]],src:s("S2 p. 57","S4")},
+ {h:["Pourquoi une V3.0","Why a V3.0"],p:["Les enseignements tirés de l’emploi de la V2.0 ont imposé sa révision. La V3.0 vise à l’améliorer et à l’adapter aux nouvelles exigences de l’environnement opérationnel. Elle décrit en détail les processus de planification propres aux niveaux stratégique et opératif.","Lessons identified from the use of V2.0 required its revision. V3.0 aims to improve it and to align it with the new requirements of the operating environment. It describes in detail the planning processes specific to the strategic and operational levels."],src:"S1"},
+ {h:["Lien avec la doctrine","Link with doctrine"],p:["Le processus de planification opérationnelle (OPP) au niveau opératif suit le COPD. La doctrine interalliée de planification est l’AJP-5 (Ed. B, 2026). Selon l’AJP-5, la planification au niveau opératif suit les quatre étapes du processus de planification opérationnelle de l’OTAN décrit dans le MC 0133.","The operational-level operations planning process (OPP) follows the COPD. Allied joint planning doctrine is AJP-5 (Ed. B, 2026). According to AJP-5, operational-level planning follows the four stages of the NATO operations planning process described in MC 0133."],src:s("S7","S5")},
+ {h:["Phases du niveau stratégique (COPD V3.0)","Strategic-level phases (COPD V3.0)"],li:[
+  ["Phase 1 – Connaissance initiale de la situation d’une crise potentielle (Initial Situational Awareness of potential crisis).","Phase 1 – Initial Situational Awareness of potential crisis."],
+  ["Phase 2 – Évaluation stratégique (Strategic Assessment) : produit la SACEUR Strategic Assessment (SSA).","Phase 2 – Strategic Assessment: produces the SACEUR Strategic Assessment (SSA)."],
+  ["Phase 3 – Élaboration des options de réponse militaire (Military Response Options Development, MRO).","Phase 3 – Military Response Options (MRO) Development."],
+  ["Phase 4 – Élaboration du plan stratégique : 4a CONOPS stratégique, 4b OPLAN stratégique et génération de forces ; directive de planification stratégique (SPD).","Phase 4 – Strategic Plan Development: 4a Strategic CONOPS, 4b Strategic OPLAN and Force Generation; Strategic Planning Directive (SPD)."],
+  ["Phase 5 – Exécution.","Phase 5 – Execution."],
+  ["Phase 6 – Transition.","Phase 6 – Transition."]],src:"S3 p. 11-13"}],
+ quiz:[
+ {q:["En quelle année la COPD V3.0 a-t-elle été publiée ?","In which year was COPD V3.0 issued?"],o:[["2010","2010"],["2013","2013"],["2021","2021"]],a:2,src:"S2, S4"},
+ {q:["Quel document est la doctrine interalliée de planification des opérations ?","Which publication is the allied joint doctrine for the planning of operations?"],o:[["AJP-5","AJP-5"],["AJP-4","AJP-4"],["MC 0133","MC 0133"]],a:0,src:"S5"},
+ {q:["Au niveau stratégique, quelle phase produit les MRO ?","At strategic level, which phase produces the MROs?"],o:[["Phase 2","Phase 2"],["Phase 3","Phase 3"],["Phase 4","Phase 4"]],a:1,src:"S3"},
+ {q:["Que produit la phase 2 du niveau stratégique ?","What does strategic-level Phase 2 produce?"],o:[["La SSA (SACEUR Strategic Assessment)","The SSA (SACEUR Strategic Assessment)"],["L’OPLAN opératif","The operational OPLAN"],["La SPD","The SPD"]],a:0,src:"S3"}]},
+{id:"ajp5",g:"cadre",t:["Les 7 activités de l’AJP-5","The 7 AJP-5 activities"],
+ but:["Connaître la séquence des activités de planification de l’AJP-5 Ed. B, qui sert de base doctrinale au COPD.","Know the sequence of planning activities in AJP-5 Ed. B, the doctrinal basis for the COPD."],
+ sec:[
+ {h:["Séquence","Sequence"],li:[["1. Lancement de la planification (planning initiation)","1. Planning initiation"],["2. Analyse de la mission (mission analysis)","2. Mission analysis"],["3. Élaboration des modes d’action (COA development)","3. Course of action (COA) development"],["4. Analyse des modes d’action (COA analysis)","4. COA analysis"],["5. Validation et comparaison des modes d’action","5. COA validation and comparison"],["6. Décision du commandant sur le mode d’action","6. Commander’s COA decision"],["7. Élaboration du plan (operation plan development)","7. Operation plan development"]],src:s("S5 ch. 3","S6")},
+ {h:["Principes","Principles"],li:[
+  ["La séquence est la même que l’on planifie à l’avance ou en réponse à une crise ; le temps disponible est la principale variable.","The sequence is the same whether planning in advance or in response to a crisis; available time is the main variable."],
+  ["La planification peut être séquentielle, parallèle ou collaborative.","Planning may be sequential, parallel or collaborative."],
+  ["Le commandant reste personnellement impliqué et valide les résultats à chaque étape.","The commander stays personally involved and validates results at each stage."],
+  ["La gestion des risques est intégrée à chaque étape (wargaming, red teaming, analyse pre-mortem).","Risk management is integrated at every stage (wargaming, red teaming, pre-mortem analysis)."],
+  ["L’analyse du centre de gravité est une activité continue.","Centre of gravity analysis is a continuous activity."]],src:s("S5","S6")},
+ {h:["Le dessin opératif (operations design)","Operations design"],p:["L’AJP-5 fait du dessin opératif l’élément clé du processus. Il mobilise notamment : lignes d’opération, point culminant, pause opérationnelle, séquencement et phases, synchronisation, simultanéité et profondeur, tempo, branches, séquelles et points de décision (avec une matrice d’aide à la décision).","AJP-5 makes operations design the key element of the process. It uses in particular: lines of operation, culmination, operational pause, sequencing and phases, synchronisation, simultaneity and depth, tempo, branches, sequels and decision points (with a decision support matrix)."],src:"S5 ch. 2"}],
+ todo:[["Correspondance détaillée entre les 7 activités de l’AJP-5 et les phases 3 et 4 du COPD V3.0 au niveau opératif.","Detailed mapping between the 7 AJP-5 activities and COPD V3.0 operational-level phases 3 and 4."]],
+ quiz:[
+ {q:["Quelle est la deuxième activité de planification de l’AJP-5 ?","What is the second AJP-5 planning activity?"],o:[["L’analyse de la mission","Mission analysis"],["L’élaboration des modes d’action","COA development"],["Le lancement","Initiation"]],a:0,src:"S5"},
+ {q:["Combien d’activités de planification l’AJP-5 Ed. B compte-t-elle ?","How many planning activities does AJP-5 Ed. B list?"],o:[["5","5"],["7","7"],["9","9"]],a:1,src:"S6"},
+ {q:["Selon l’AJP-5, quelle est la principale variable entre planification anticipée et planification de crise ?","According to AJP-5, what is the main variable between advance and crisis planning?"],o:[["Le temps disponible","Available time"],["Le niveau de commandement","The level of command"],["Le nombre de modes d’action","The number of COAs"]],a:0,src:"S6"},
+ {q:["L’analyse du centre de gravité est…","Centre of gravity analysis is…"],o:[["réalisée une seule fois, en analyse de la mission","done once, in mission analysis"],["une activité continue","a continuous activity"],["réservée au niveau stratégique","reserved for the strategic level"]],a:1,src:"S6"}]},
+{id:"p1",g:"op",t:["Phase 1 – Connaissance initiale de la situation","Phase 1 – Initial situational awareness"],
+ but:["Acquérir une première compréhension d’une crise potentielle ou réelle.","Gain an initial understanding of a potential or actual crisis."],
+ sec:[{h:["Intitulé","Title"],p:["En V2.0 : connaissance initiale de la situation d’une crise potentielle ou réelle. Selon S2, les intitulés des phases de la V3.0 sont dans l’ensemble inchangés par rapport à la V2.0, mais leur contenu a été révisé. En V1.0, la phase s’intitulait « Situation Awareness ».","In V2.0: initial situational awareness of a potential or actual crisis. According to S2, V3.0 phase titles are largely unchanged from V2.0, but their content was revised. In V1.0 the phase was called “Situation Awareness”."],src:"S2 p. 57"}],
+ todo:[["Intitulé anglais exact en V3.0, activités, acteurs et produits de la phase 1 au niveau opératif.","Exact V3.0 English title, activities, actors and products of operational-level Phase 1."]],
+ tpl:[{k:"crise",l:["Nature de la crise","Nature of the crisis"]},{k:"acteurs",l:["Principaux acteurs","Main actors"]},{k:"inconnues",l:["Ce que l’on ignore (besoins en renseignement)","What we do not know (information requirements)"]}]},
+{id:"p2",g:"op",t:["Phase 2 – Appréciation opérative de l’environnement stratégique","Phase 2 – Operational appreciation of the strategic environment"],
+ but:["Comprendre l’environnement stratégique du point de vue du niveau opératif, à partir des travaux du niveau stratégique.","Understand the strategic environment from the operational-level perspective, based on strategic-level work."],
+ sec:[{h:["Intitulé","Title"],p:["En V2.0 : appréciation opérative de l’environnement stratégique. En V1.0 : appréciation opérative de l’évaluation stratégique de SACEUR et évaluation des options de réponse militaire.","In V2.0: operational appreciation of the strategic environment. In V1.0: operational appreciation of SACEUR’s strategic assessment and assessment of military response options."],src:"S2 p. 57"},
+ {h:["Articulation avec le niveau stratégique","Link with the strategic level"],p:["Au même moment, le niveau stratégique conduit son évaluation (SSA, phase 2) puis élabore les MRO (phase 3).","At the same time the strategic level conducts its assessment (SSA, Phase 2) then develops the MROs (Phase 3)."],src:"S3"}],
+ todo:[["Contenu détaillé de la phase 2 en V3.0 (analyse des acteurs, systèmes, contributions du niveau opératif aux MRO).","Detailed V3.0 Phase 2 content (actor and system analysis, operational-level contributions to MROs)."]],
+ tpl:[{k:"env",l:["Environnement stratégique : éléments clés","Strategic environment: key elements"]},{k:"so",l:["Effets et objectifs stratégiques connus","Known strategic objectives and effects"]},{k:"contrib",l:["Contribution du niveau opératif","Operational-level contribution"]}]},
+{id:"p3a",g:"op",t:["Phase 3a – Analyse de la mission","Phase 3a – Mission analysis"],
+ but:["Comprendre la mission reçue pour en déduire ce que la force doit accomplir.","Understand the mission received to deduce what the force must achieve."],
+ sec:[{h:["Place","Place"],p:["En V2.0, la phase 3 « Estimation opérative » (Operational Estimate) comprend l’analyse de la mission (3a) et l’élaboration des modes d’action (3b).","In V2.0, Phase 3 “Operational Estimate” comprises mission analysis (3a) and COA development (3b)."],src:"S2 p. 57"},
+ {h:["Ce qu’en dit l’AJP-5","What AJP-5 says"],li:[["L’analyse de la mission est l’activité au cours de laquelle le commandant et l’état-major élaborent plans et ordres.","Mission analysis is the activity in which the commander and staff develop plans and orders."],["Pendant l’analyse de la mission, l’état-major identifie les publics clés à soumettre au commandant, ce qui aboutit au récit (narrative) de communication stratégique du commandant, repris dans le CONOPS.","During mission analysis, the staff identify key audiences for the commander’s approval, leading to the commander’s strategic communications narrative, carried into the CONOPS."],["Produits cités par l’AJP-5 pendant la planification : directives de planification, ordres préparatoires, besoins en informations critiques du commandant (CCIR).","Products named by AJP-5 during planning: planning guidance, warning orders, commander’s critical information requirements (CCIRs)."]],src:s("S5","S6")}],
+ todo:[["Étapes détaillées de l’analyse de la mission en V3.0 et produits (briefing d’analyse de la mission, directive de planification du commandant…).","Detailed V3.0 mission analysis steps and products (mission analysis briefing, commander’s planning guidance…)."]],
+ quiz:[
+ {q:["En V2.0, la phase 3 du niveau opératif s’intitule…","In V2.0, operational-level Phase 3 is called…"],o:[["Estimation opérative","Operational Estimate"],["Exécution","Execution"],["Élaboration du plan","Plan Development"]],a:0,src:"S2"},
+ {q:["Où le récit de communication stratégique du commandant est-il repris ?","Where is the commander’s strategic communications narrative carried?"],o:[["Dans le CONOPS","In the CONOPS"],["Uniquement dans l’ordre préparatoire","Only in the warning order"],["Nulle part","Nowhere"]],a:0,src:"S6"},
+ {q:["Que désigne CCIR ?","What does CCIR stand for?"],o:[["Besoins en informations critiques du commandant","Commander’s critical information requirements"],["Règles d’engagement","Rules of engagement"],["Plan de soutien","Support plan"]],a:0,src:"S5"}],
+ tpl:[{k:"mission",l:["Mission reçue (texte)","Mission received (text)"]},{k:"taches",l:["Tâches explicites et implicites","Specified and implied tasks"]},{k:"cont",l:["Contraintes et restrictions","Constraints and restraints"]},{k:"hyp",l:["Hypothèses","Assumptions"]},{k:"cog",l:["Centres de gravité (ami / adverse)","Centres of gravity (friendly / opposing)"]},{k:"ccir",l:["CCIR proposés","Proposed CCIRs"]},{k:"publics",l:["Publics clés (communication stratégique)","Key audiences (strategic communications)"]},{k:"risques",l:["Risques identifiés","Identified risks"]}]},
+{id:"p3b",g:"op",t:["Phase 3b – Élaboration des modes d’action","Phase 3b – COA development"],
+ but:["Concevoir des modes d’action, les analyser, les comparer et obtenir la décision du commandant.","Develop courses of action, analyse and compare them and obtain the commander’s decision."],
+ sec:[{h:["Place","Place"],p:["En V2.0, l’élaboration des modes d’action devient la phase 3b ; en V1.0 elle relevait de la phase 4A.","In V2.0, COA development becomes Phase 3b; in V1.0 it was part of Phase 4A."],src:"S2 p. 57"},
+ {h:["Ce qu’en dit l’AJP-5","What AJP-5 says"],li:[["Activités 3 à 6 : élaboration, analyse, validation et comparaison des modes d’action, puis décision du commandant.","Activities 3 to 6: COA development, analysis, validation and comparison, then commander’s decision."],["Outils cités : wargaming (annexe C), red teaming, analyse pre-mortem.","Tools named: wargaming (Annex C), red teaming, pre-mortem analysis."]],src:s("S5","S6")}],
+ todo:[["Critères de validité des modes d’action, méthode de comparaison et produits de la phase 3b en V3.0.","COA validity criteria, comparison method and Phase 3b products in V3.0."]],
+ quiz:[
+ {q:["En V1.0, à quelle phase appartenait l’élaboration des modes d’action ?","In V1.0, which phase included COA development?"],o:[["3","3"],["4A","4A"],["5","5"]],a:1,src:"S2"},
+ {q:["Quelle annexe de l’AJP-5 Ed. B traite du wargaming ?","Which AJP-5 Ed. B annex covers wargaming?"],o:[["Annexe A","Annex A"],["Annexe B","Annex B"],["Annexe C","Annex C"]],a:2,src:"S5"}],
+ tpl:[{k:"coa",l:["Modes d’action (un par ligne : nom, idée)","Courses of action (one per line: name, idea)"]},{k:"crit",l:["Critères de comparaison","Comparison criteria"]},{k:"wg",l:["Enseignements du wargaming","Wargaming lessons"]},{k:"reco",l:["Mode d’action recommandé et justification","Recommended COA and rationale"]}]},
+{id:"p4a",g:"op",t:["Phase 4a – Élaboration du CONOPS","Phase 4a – CONOPS development"],
+ but:["Traduire le mode d’action retenu en concept d’opération.","Turn the selected COA into a concept of operations."],
+ sec:[{h:["Place","Place"],p:["En V1.0, la phase 4A est l’élaboration du concept d’opération (CONOPS) opératif ; selon S2, les intitulés de la V3.0 sont dans l’ensemble inchangés.","In V1.0, Phase 4A is operational CONOPS development; according to S2, V3.0 titles are largely unchanged."],src:"S2 p. 57"},
+ {h:["Ce qu’en dit l’AJP-5","What AJP-5 says"],p:["Le CONOPS comprend notamment la manœuvre et l’effort principal ; il reprend le récit de communication stratégique du commandant.","The CONOPS includes in particular the scheme of manoeuvre and the main effort; it carries the commander’s strategic communications narrative."],src:"S6"}],
+ todo:[["Intitulé exact en V3.0, structure du CONOPS et circuit d’approbation.","Exact V3.0 title, CONOPS structure and approval route."]],
+ tpl:[{k:"intent",l:["Intention du commandant","Commander’s intent"]},{k:"man",l:["Manœuvre et effort principal","Scheme of manoeuvre and main effort"]},{k:"phases",l:["Phases de l’opération","Phases of the operation"]},{k:"dp",l:["Points de décision, branches et séquelles","Decision points, branches and sequels"]}]},
+{id:"p4b",g:"op",t:["Phase 4b – Élaboration de l’OPLAN","Phase 4b – OPLAN development"],
+ but:["Développer le plan d’opération (OPLAN) à partir du CONOPS approuvé.","Develop the operation plan (OPLAN) from the approved CONOPS."],
+ sec:[{h:["Place","Place"],p:["En V1.0, la phase 4B est l’élaboration du plan d’opération opératif.","In V1.0, Phase 4B is operational plan development."],src:"S2 p. 57"},
+ {h:["Ce qu’en dit l’AJP-5","What AJP-5 says"],p:["Le processus aboutit à un plan ou à un ordre. Produits associés cités : demandes de règles d’engagement (ROE) et plans de soutien (SUPPLAN).","The process ends with a plan or order. Associated products named: rules of engagement (ROE) requests and support plans (SUPPLANs)."],src:"S5"}],
+ todo:[["Intitulé exact en V3.0, structure de l’OPLAN et articulation avec la génération de forces.","Exact V3.0 title, OPLAN structure and link with force generation."]],
+ quiz:[
+ {q:["Que sont les SUPPLAN ?","What are SUPPLANs?"],o:[["Des plans de soutien","Support plans"],["Des ordres préparatoires","Warning orders"],["Des options de réponse militaire","Military response options"]],a:0,src:"S5"}],
+ tpl:[{k:"roe",l:["Demandes de ROE","ROE requests"]},{k:"supp",l:["Plans de soutien nécessaires","Required support plans"]},{k:"annexes",l:["Annexes à rédiger","Annexes to write"]}]},
+{id:"p5",g:"op",t:["Phase 5 – Exécution","Phase 5 – Execution"],
+ but:["Conduire l’opération, en évaluer les progrès et revoir le plan.","Conduct the operation, assess progress and review the plan."],
+ sec:[{h:["Place","Place"],p:["En V1.0, la phase 5 couvre l’exécution, l’évaluation de la campagne et la revue du plan.","In V1.0, Phase 5 covers execution, campaign assessment and plan review."],src:"S2 p. 57"}],
+ todo:[["Contenu de la phase 5 en V3.0, en particulier l’évaluation des opérations (operations assessment).","V3.0 Phase 5 content, in particular operations assessment."]],
+ tpl:[{k:"ind",l:["Indicateurs de progrès","Progress indicators"]},{k:"revue",l:["Déclencheurs de revue du plan","Plan review triggers"]}]},
+{id:"p6",g:"op",t:["Phase 6 – Transition","Phase 6 – Transition"],
+ but:["Préparer la transition et la fin de l’engagement des forces de l’OTAN.","Prepare transition and the end of NATO forces’ engagement."],
+ sec:[{h:["Place","Place"],p:["En V1.0, la phase 6 (transition) donne lieu à un plan pour le retrait coordonné des forces de l’OTAN.","In V1.0, Phase 6 (transition) produces a plan for the coordinated withdrawal of NATO forces."],src:"S2 p. 56"}],
+ todo:[["Contenu de la phase 6 en V3.0 (transfert de responsabilités, critères de transition).","V3.0 Phase 6 content (handover of responsibilities, transition criteria)."]],
+ quiz:[
+ {q:["Que produit la phase de transition selon la description de la V1.0 ?","What does the transition phase produce according to the V1.0 description?"],o:[["Un plan de retrait coordonné des forces de l’OTAN","A plan for the coordinated withdrawal of NATO forces"],["Les MRO","The MROs"],["La SSA","The SSA"]],a:0,src:"S2"}],
+ tpl:[{k:"crit",l:["Critères de transition","Transition criteria"]},{k:"releve",l:["À qui transférer quoi","What to hand over to whom"]}]},
+{id:"vienne",g:"out",t:["Fil rouge VIENNE","VIENNE running case"],
+ but:["Réutiliser le thème d’exercice VIENNE (MaisDot) comme fil rouge au niveau opératif.","Reuse the VIENNE exercise theme (MaisDot) as a running case at operational level."],
+ sec:[{h:["Situation générale (dossier VIENNE)","General situation (VIENNE file)"],p:["La CONFÉDÉRATION MINOS a envahi la RÉPUBLIQUE DES CHARENTES en mai 2023 et déclaré son annexion le 27 mai. L’alliance AZUR intervient (opération CHARENTES FREEDOM, résolution 2702 du 10 juin 2023). Le I(AZ)CA, depuis la ZDAE PERIGORD, mène une diversion au SUD ; la 3(AZ)DB attaque dans la profondeur par l’EST, depuis la VIENNE.","The MINOS CONFEDERATION invaded the REPUBLIC OF CHARENTES in May 2023 and declared its annexation on 27 May. The AZUR alliance intervenes (operation CHARENTES FREEDOM, resolution 2702 of 10 June 2023). I(AZ) Corps, from the PERIGORD staging area, conducts a diversion in the SOUTH; 3(AZ) Armoured Division attacks in depth from the EAST, from the VIENNE."],src:["Dossier VIENNE, repris de MaisDot (src/demo.js).","VIENNE file, taken from MaisDot (src/demo.js)."]}],
+ todo:[["Le dossier VIENNE est écrit au niveau tactique (division, brigade). Il faut l’élever au niveau opératif : quartier général opératif d’AZUR et sa mission, directive stratégique, MRO, objectifs, acteurs non militaires. Aucune de ces données n’est dans le dossier (PM).","The VIENNE file is written at tactical level (division, brigade). It must be raised to operational level: AZUR operational headquarters and its mission, strategic directive, MROs, objectives, non-military actors. None of these is in the file (PM)."]],
+ tpl:[{k:"qg",l:["Quartier général opératif d’AZUR et mission (PM)","AZUR operational HQ and mission (PM)"]},{k:"so",l:["Objectifs stratégiques de l’opération CHARENTES FREEDOM (PM)","Strategic objectives of CHARENTES FREEDOM (PM)"]},{k:"cog",l:["Centres de gravité MINOS / AZUR (à valider)","MINOS / AZUR centres of gravity (to be validated)"]}]},
+{id:"sources",g:"out",t:["Sources","Sources"],
+ but:["Toutes les affirmations du parcours renvoient à l’une de ces sources ouvertes.","Every statement in this course refers to one of these open sources."],sources:true}
+];
+const KEY="copd-cpd-v1";
+let S=(()=>{try{return JSON.parse(localStorage.getItem(KEY))||{v:{},q:{}}}catch(e){return{v:{},q:{}}}})();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+let cur=location.hash.slice(1)||"accueil",tab=0;
+function toggleLang(){setLang(lang==="fr"?"en":"fr")}
+function setLang(l){lang=l;try{localStorage.setItem("copd-lang",l)}catch(e){}document.documentElement.lang=l;render()}
+function srcTag(x){if(!x)return"";return`<div class="src">Source${L([" : ",": "])}${esc(L(x))}</div>`}
+function nav(){let h="",g="";for(const m of M){if(m.g!==g){g=m.g;h+=`<div class="grp">${esc(L(UI.grp[g]))}</div>`}
+ const ok=S.q[m.id]>=70;h+=`<a class="${m.id===cur?"on":""}" onclick="go('${m.id}')"><span class="st ${ok?"ok":""}">${ok?"✓":""}</span>${esc(L(m.t))}</a>`}
+ document.getElementById("nav").innerHTML=h;
+ const qm=M.filter(m=>m.quiz),n=qm.filter(m=>S.q[m.id]>=70).length;
+ document.getElementById("pt").textContent=`${L(UI.prog)}${L([" : ",": "])}${n}/${qm.length}`;document.getElementById("pb").style.width=(100*n/qm.length)+"%"}
+function go(id){cur=id;tab=0;location.hash=id;document.getElementById("nav").classList.remove("open");render();scrollTo(0,0)}
+function comprendre(m){let h=`<div class="card but"><h3>${esc(L(UI.but))}</h3><p>${esc(L(m.but))}</p></div>`;
+ for(const x of m.sec||[]){h+=`<div class="card"><h3>${esc(L(x.h))}</h3>${x.p?`<p>${esc(L(x.p))}</p>`:""}${x.li?`<ul>${x.li.map(i=>`<li>${esc(L(i))}</li>`).join("")}</ul>`:""}${srcTag(x.src)}</div>`}
+ if(m.todo)h+=`<div class="card ac"><b>${esc(L(UI.todo))}</b><p class="src">${esc(L(UI.todoh))}</p><ul>${m.todo.map(i=>`<li>${esc(L(i))}</li>`).join("")}</ul></div>`;
+ if(m.sources){h+=`<table><tr><th>Réf.</th><th>${lang==="en"?"Reference":"Référence"}</th></tr>${Object.entries(SRC).map(([k,v])=>`<tr><td>${k}</td><td>${esc(v[0])}<br><a href="${esc(v[1])}" target="_blank" rel="noopener">${esc(v[1])}</a></td></tr>`).join("")}</table>
+ <div class="card ac"><b>${esc(L(UI.todo))}</b><p>${esc(L(["Texte du COPD V3.0 (ACO/SHAPE, 2021) : non trouvé en diffusion publique officielle, donc non utilisé. Des copies non officielles circulent en ligne ; elles n’ont pas été exploitées.","COPD V3.0 text (ACO/SHAPE, 2021): not found in an official public release, so not used. Unofficial copies circulate online; they were not used."]))}</p></div>`}
+ return h}
+function sentrainer(m){if(!m.quiz)return`<p>${esc(L(UI.noquiz))}</p>`;
+ return m.quiz.map((q,i)=>`<div class="q card" id="q${i}"><b>${i+1}. ${esc(L(q.q))}</b>${q.o.map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${esc(L(o))}</label>`).join("")}${srcTag(q.src)}</div>`).join("")+
+ `<button class="btn" onclick="corriger()">${esc(L(UI.check))}</button><button class="btn s" onclick="render()">${esc(L(UI.retry))}</button><div class="score" id="sc">${S.q[m.id]!=null?`${L(UI.score)}${L([" : ",": "])}${S.q[m.id]} %`:""}</div>`}
+function corriger(){const m=M.find(x=>x.id===cur);let ok=0;m.quiz.forEach((q,i)=>{const r=document.querySelector(`input[name=q${i}]:checked`);
+ document.querySelectorAll(`#q${i} label`).forEach((lb,j)=>{lb.className=j===q.a?"ok":(r&&+r.value===j?"ko":"")});if(r&&+r.value===q.a)ok++});
+ const p=Math.round(100*ok/m.quiz.length);S.q[m.id]=Math.max(p,S.q[m.id]||0);save();nav();
+ document.getElementById("sc").textContent=`${L(UI.score)}${L([" : ",": "])}${p} % – ${L(p>=70?UI.valid:UI.notv)}`}
+function appliquer(m){if(!m.tpl)return`<p>${esc(L(UI.notpl))}</p>`;const v=S.v[m.id]||{};
+ return`<p class="src">${esc(L(UI.tplh))}</p>`+m.tpl.map(f=>`<div class="fld"><label for="f_${f.k}">${esc(L(f.l))}</label><textarea id="f_${f.k}" oninput="setv('${m.id}','${f.k}',this.value)">${esc(v[f.k]||"")}</textarea></div>`).join("")+outils()}
+function setv(id,k,x){(S.v[id]=S.v[id]||{})[k]=x;save()}
+function outils(){return`<div style="margin-top:16px"><button class="btn s" onclick="exp()">${esc(L(UI.save))}</button><label class="btn s">${esc(L(UI.load))}<input type="file" accept=".json" hidden onchange="imp(this)"></label><button class="btn s" onclick="print()">${esc(L(UI.print))}</button><button class="btn s" onclick="raz()">${esc(L(UI.clear))}</button></div>`}
+function exp(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:"application/json"}));a.download="copd-travaux.json";a.click()}
+function imp(i){const f=i.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(o&&o.v&&o.q){S=o;save();render()}}catch(e){}})}
+function raz(){if(confirm(L(UI.clearq))){S={v:{},q:{}};save();render()}}
+function render(){document.getElementById("ttl").textContent=L(UI.ttl);document.getElementById("sub").textContent=L(UI.sub);document.getElementById("lng").textContent=L(UI.lng);document.title=L(UI.ttl);
+ nav();const m=M.find(x=>x.id===cur)||M[0];cur=m.id;
+ const multi=m.quiz||m.tpl;let h=`<h2>${esc(L(m.t))}</h2>`;
+ if(multi)h+=`<div class="tabs">${UI.tabs.map((t,i)=>`<button class="${i===tab?"on":""}" onclick="tab=${i};render()">${esc(L(t))}</button>`).join("")}</div>`;
+ h+=!multi||tab===0?comprendre(m):tab===1?sentrainer(m):appliquer(m);
+ if(cur==="accueil")h+=outils();
+ document.getElementById("main").innerHTML=h}
+addEventListener("hashchange",()=>{const id=location.hash.slice(1);if(id&&id!==cur&&M.some(m=>m.id===id)){cur=id;tab=0;render()}});
+document.documentElement.lang=lang;render();
+</script>
+</body>
+</html>
